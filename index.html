@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Query Hub · Proesc</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #161b27;
+    --surface2: #1e2535;
+    --border: #2a3347;
+    --border-focus: #4a6fa5;
+    --text: #e2e8f0;
+    --text-muted: #64748b;
+    --text-dim: #94a3b8;
+    --accent: #3b82f6;
+    --accent-glow: rgba(59,130,246,0.15);
+    --danger: #ef4444;
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 16px 80px;
+  }
+
+  /* Background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(59,130,246,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(59,130,246,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 680px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  header {
+    margin-bottom: 40px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .logo-icon {
+    width: 32px;
+    height: 32px;
+    background: var(--accent);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+
+  .logo-text {
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+  }
+
+  .logo-text span {
+    color: var(--accent);
+  }
+
+  h1 {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.02em;
+  }
+
+  .subtitle {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  /* Warning banner */
+  .banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: rgba(245,158,11,0.08);
+    border: 1px solid rgba(245,158,11,0.2);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 28px;
+    font-size: 13px;
+    color: var(--warning);
+    line-height: 1.5;
+  }
+
+  .banner-icon { font-size: 16px; margin-top: 1px; flex-shrink: 0; }
+
+  /* Form card */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    margin-bottom: 16px;
+  }
+
+  .card-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* Fields */
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+
+  .field:last-child { margin-bottom: 0; }
+
+  label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-dim);
+    letter-spacing: 0.02em;
+  }
+
+  label .required {
+    color: var(--danger);
+    margin-left: 2px;
+  }
+
+  input, select, textarea {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    width: 100%;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+
+  select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+    cursor: pointer;
+  }
+
+  select option { background: var(--surface2); }
+
+  textarea {
+    font-family: var(--mono);
+    font-size: 13px;
+    resize: vertical;
+    min-height: 160px;
+    line-height: 1.6;
+    tab-size: 2;
+  }
+
+  textarea::placeholder { color: var(--text-muted); font-family: var(--mono); }
+
+  .hint {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  /* Type badges */
+  .type-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+
+  .type-option {
+    position: relative;
+  }
+
+  .type-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .type-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 8px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+    background: var(--surface2);
+  }
+
+  .type-label .type-icon { font-size: 18px; }
+  .type-label .type-name { font-size: 11px; font-weight: 500; color: var(--text-dim); }
+
+  .type-option input:checked + .type-label {
+    border-color: var(--accent);
+    background: var(--accent-glow);
+  }
+
+  .type-option input:checked + .type-label .type-name { color: var(--accent); }
+  .type-label:hover { border-color: var(--border-focus); }
+
+  /* Submit button */
+  .btn-submit {
+    width: 100%;
+    padding: 14px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    letter-spacing: -0.01em;
+  }
+
+  .btn-submit:hover { background: #2563eb; transform: translateY(-1px); box-shadow: 0 4px 20px rgba(59,130,246,0.3); }
+  .btn-submit:active { transform: translateY(0); }
+  .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  /* States */
+  .state-loading, .state-success, .state-error {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 60px 32px;
+    gap: 16px;
+  }
+
+  .state-icon { font-size: 48px; }
+
+  .state-title {
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  .state-desc {
+    font-size: 14px;
+    color: var(--text-muted);
+    max-width: 380px;
+    line-height: 1.6;
+  }
+
+  .btn-back {
+    margin-top: 8px;
+    padding: 10px 24px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    border-radius: 8px;
+    font-family: var(--sans);
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn-back:hover { border-color: var(--border-focus); color: var(--text); }
+
+  /* Spinner */
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner {
+    width: 40px; height: 40px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  /* Footer */
+  footer {
+    margin-top: 32px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-muted);
+    font-family: var(--mono);
+  }
+
+  @media (max-width: 480px) {
+    .field-row { grid-template-columns: 1fr; }
+    .type-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div class="logo">
+      <div class="logo-icon">🗄️</div>
+      <span class="logo-text">proesc / <span>query-hub</span></span>
+    </div>
+    <h1>Solicitação de Query</h1>
+    <p class="subtitle">Envie sua query para aprovação antes da execução em produção</p>
+  </header>
+
+  <!-- FORM STATE -->
+  <div id="formState">
+    <div class="banner">
+      <span class="banner-icon">⚠️</span>
+      <span>Todas as queries passam por revisão do Coordenador antes de serem executadas em produção. Não execute queries diretamente sem aprovação.</span>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Identificação</div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Seu nome <span class="required">*</span></label>
+          <input type="text" id="nome" placeholder="Ex: Ana Beatriz" autocomplete="name" />
+        </div>
+        <div class="field">
+          <label>Ticket Zendesk <span class="required">*</span></label>
+          <input type="text" id="ticket" placeholder="Ex: #155699" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Servidor / Banco <span class="required">*</span></label>
+        <select id="servidor">
+          <option value="">Selecione o servidor...</option>
+          <option value="producao">🟢 Produção (app.proesc.com)</option>
+          <option value="dados1">🔵 dados1 (Roberto)</option>
+          <option value="dados2">🔵 dados2 (Felipe Damasceno)</option>
+          <option value="dados3">🔵 dados3 (Bruno)</option>
+          <option value="dados4">🔵 dados4 (Filipe Nunes)</option>
+          <option value="homologacao">🟡 Homologação</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Query</div>
+
+      <div class="field" style="margin-bottom:20px">
+        <label>Tipo de operação <span class="required">*</span></label>
+        <div class="type-grid">
+          <div class="type-option">
+            <input type="radio" name="tipo" id="t-select" value="SELECT">
+            <label class="type-label" for="t-select">
+              <span class="type-icon">🔍</span>
+              <span class="type-name">SELECT</span>
+            </label>
+          </div>
+          <div class="type-option">
+            <input type="radio" name="tipo" id="t-update" value="UPDATE">
+            <label class="type-label" for="t-update">
+              <span class="type-icon">✏️</span>
+              <span class="type-name">UPDATE</span>
+            </label>
+          </div>
+          <div class="type-option">
+            <input type="radio" name="tipo" id="t-delete" value="DELETE">
+            <label class="type-label" for="t-delete">
+              <span class="type-icon">🗑️</span>
+              <span class="type-name">DELETE</span>
+            </label>
+          </div>
+          <div class="type-option">
+            <input type="radio" name="tipo" id="t-insert" value="INSERT">
+            <label class="type-label" for="t-insert">
+              <span class="type-icon">➕</span>
+              <span class="type-name">INSERT</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Query SQL <span class="required">*</span></label>
+        <textarea id="query" placeholder="Cole aqui a query que precisa ser executada..."></textarea>
+        <span class="hint">Cole a query exatamente como deve ser executada. Sem ponto e vírgula extra no final.</span>
+      </div>
+
+      <div class="field">
+        <label>Motivo / Contexto <span class="required">*</span></label>
+        <textarea id="motivo" style="min-height:80px;font-family:var(--sans);font-size:14px" placeholder="Explique brevemente por que essa query é necessária e qual problema ela resolve..."></textarea>
+      </div>
+    </div>
+
+    <button class="btn-submit" id="btnEnviar" onclick="enviar()">
+      <span>📤</span> Enviar para Aprovação
+    </button>
+  </div>
+
+  <!-- LOADING STATE -->
+  <div id="loadingState" class="state-loading">
+    <div class="spinner"></div>
+    <div class="state-title">Enviando...</div>
+    <div class="state-desc">Aguarde enquanto enviamos sua solicitação.</div>
+  </div>
+
+  <!-- SUCCESS STATE -->
+  <div id="successState" class="state-success">
+    <div class="state-icon">✅</div>
+    <div class="state-title">Solicitação enviada!</div>
+    <div class="state-desc">
+      Alexandre foi notificado no Slack e irá revisar sua query em breve.
+      Você receberá uma notificação quando for aprovada ou recusada.
+    </div>
+    <button class="btn-back" onclick="resetForm()">Enviar outra query</button>
+  </div>
+
+  <!-- ERROR STATE -->
+  <div id="errorState" class="state-error">
+    <div class="state-icon">❌</div>
+    <div class="state-title">Erro ao enviar</div>
+    <div class="state-desc" id="errorMsg">Não foi possível enviar a solicitação. Tente novamente.</div>
+    <button class="btn-back" onclick="showForm()">Tentar novamente</button>
+  </div>
+
+  <footer>query-hub v1.0 · proesc suporte · execuções requerem aprovação</footer>
+</div>
+
+<script>
+  // ⚠️ CONFIGURAR AQUI: Cole a URL do webhook do n8n depois de criar
+  const WEBHOOK_URL = 'COLE_AQUI_A_URL_DO_WEBHOOK_N8N';
+
+  function showForm() {
+    document.getElementById('formState').style.display = 'block';
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('successState').style.display = 'none';
+    document.getElementById('errorState').style.display = 'none';
+  }
+
+  function resetForm() {
+    document.getElementById('nome').value = '';
+    document.getElementById('ticket').value = '';
+    document.getElementById('servidor').value = '';
+    document.getElementById('query').value = '';
+    document.getElementById('motivo').value = '';
+    document.querySelectorAll('input[name="tipo"]').forEach(r => r.checked = false);
+    showForm();
+  }
+
+  async function enviar() {
+    const nome = document.getElementById('nome').value.trim();
+    const ticket = document.getElementById('ticket').value.trim();
+    const servidor = document.getElementById('servidor').value;
+    const query = document.getElementById('query').value.trim();
+    const motivo = document.getElementById('motivo').value.trim();
+    const tipo = document.querySelector('input[name="tipo"]:checked')?.value;
+
+    if (!nome || !ticket || !servidor || !query || !motivo || !tipo) {
+      alert('Preencha todos os campos obrigatórios antes de enviar.');
+      return;
+    }
+
+    if (WEBHOOK_URL === 'COLE_AQUI_A_URL_DO_WEBHOOK_N8N') {
+      alert('⚠️ O app ainda não foi configurado. URL do webhook não definida.');
+      return;
+    }
+
+    document.getElementById('formState').style.display = 'none';
+    document.getElementById('loadingState').style.display = 'flex';
+
+    try {
+      const resp = await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nome,
+          ticket,
+          servidor,
+          query,
+          motivo,
+          tipo,
+          timestamp: new Date().toISOString()
+        })
+      });
+
+      if (resp.ok) {
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('successState').style.display = 'flex';
+      } else {
+        throw new Error(`HTTP ${resp.status}`);
+      }
+    } catch (err) {
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('errorMsg').textContent = `Erro: ${err.message}. Verifique sua conexão e tente novamente.`;
+      document.getElementById('errorState').style.display = 'flex';
+    }
+  }
+
+  // Detecta tipo automaticamente ao digitar na textarea
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('query').addEventListener('input', function() {
+      const val = this.value.trim().toUpperCase();
+      if (val.startsWith('SELECT')) document.getElementById('t-select').checked = true;
+      else if (val.startsWith('UPDATE')) document.getElementById('t-update').checked = true;
+      else if (val.startsWith('DELETE')) document.getElementById('t-delete').checked = true;
+      else if (val.startsWith('INSERT')) document.getElementById('t-insert').checked = true;
+    });
+    showForm();
+  });
+</script>
+
+</body>
+</html>
