@@ -490,7 +490,6 @@
   function resetForm() {
     document.getElementById('nome').value = '';
     document.getElementById('ticket').value = '';
-    document.getElementById('servidor').value = '';
     document.getElementById('query').value = '';
     document.getElementById('motivo').value = '';
     document.querySelectorAll('input[name="tipo"]').forEach(r => r.checked = false);
@@ -500,12 +499,11 @@
   async function enviar() {
     const nome = document.getElementById('nome').value.trim();
     const ticket = document.getElementById('ticket').value.trim();
-    const servidor = document.getElementById('servidor').value;
     const query = document.getElementById('query').value.trim();
     const motivo = document.getElementById('motivo').value.trim();
     const tipo = document.querySelector('input[name="tipo"]:checked')?.value;
 
-    if (!nome || !ticket || !servidor || !query || !motivo || !tipo) {
+    if (!nome || !ticket || !query || !motivo || !tipo) {
       alert('Preencha todos os campos obrigatórios antes de enviar.');
       return;
     }
@@ -525,7 +523,6 @@
         body: JSON.stringify({
           nome,
           ticket,
-          servidor,
           query,
           motivo,
           tipo,
